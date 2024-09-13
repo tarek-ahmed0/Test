@@ -4,7 +4,7 @@ import numpy as np
 import streamlit as st
 
 # Data Ingestion :
-main = pd.read_csv(r'tourist_preferences_recommendations.csv')
+main = pd.read_csv(r'tourist_preferences_recommendations.csv', delimiter=';')
 
 # Setup Our Application ( Deployment )
 st.title(""":blue[Travel Vision] Agent 🤖""")
