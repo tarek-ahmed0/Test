@@ -4,7 +4,7 @@ import numpy as np
 import streamlit as st
 
 # Data Ingestion :
-main = pd.read_excel(r"D:\Graduation Project\Recommendation System\Dataset\tourist_preferences_recommendations.xlsx")
+main = pd.read_excel(r"tourist_preferences_recommendations.xlsx")
 
 # Setup Our Application ( Deployment )
 st.title(""":blue[Travel Vision] Agent 🤖""")
