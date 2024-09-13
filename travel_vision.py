@@ -4,7 +4,7 @@ import numpy as np
 import streamlit as st
 
 # Data Ingestion :
-main = pd.read_excel(r"tourist_preferences_recommendations.xlsx", engine='xlrd')
+main = pd.read_csv(r'tourist_preferences_recommendations.csv')
 
 # Setup Our Application ( Deployment )
 st.title(""":blue[Travel Vision] Agent 🤖""")
