@@ -1,5 +1,7 @@
-import pandas as pd
-import streamlit as st
-from gtts import gTTS
-from io import BytesIO
-import base64
+pandas
+streamlit
+gtts
+gTTS
+io
+BytesIO
+base64
