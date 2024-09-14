@@ -1,3 +1,6 @@
 streamlit
 pandas
 numpy
+gTTS
+BytesIO
+base64
