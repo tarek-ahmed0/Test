@@ -1,7 +1,7 @@
 # Used Libraries:
 import pandas as pd
 import streamlit as st
-import pyttsx3
+from google.cloud import texttospeech
 from io import BytesIO
 import base64
 
@@ -71,42 +71,52 @@ recomm_df = main[(main['Nationality'] == nationality_selected) &
                  (main['Travel Companion'] == travel_type) & 
                  (main['Budget Range'] == budget)]
 
+# Function to use Google Text-to-Speech API
+def play_tts_google(text):
+    client = texttospeech.TextToSpeechClient()
+    
+    # Synthesis Input
+    synthesis_input = texttospeech.SynthesisInput(text=text)
+    
+    # Voice settings (you can change language code and voice type)
+    voice = texttospeech.VoiceSelectionParams(
+        language_code="en-US", ssml_gender=texttospeech.SsmlVoiceGender.NEUTRAL
+    )
+    
+    # Audio settings
+    audio_config = texttospeech.AudioConfig(audio_encoding=texttospeech.AudioEncoding.MP3)
+    
+    # Perform the text-to-speech request
+    response = client.synthesize_speech(
+        input=synthesis_input, voice=voice, audio_config=audio_config
+    )
+    
+    # Return audio content
+    audio_data = BytesIO(response.audio_content)
+    audio_data.seek(0)
+    return audio_data
+
 # Display recommendations in a compact expandable container
 with st.expander(":green[Travel Vision Suggestions 🎯]", expanded=True):
     if not recomm_df.empty:
         recommended_hotel = recomm_df.sample(n=1)['Hotel Recommendations'].values[0]
         recommended_rest = recomm_df.sample(n=1)['Restaurant Recommendations'].values[0]
         recommended_act = recomm_df.sample(n=1)['Activity Recommendations'].values[0]
-        st.write(
-            f"Hello! Welcome to Egypt. Firstly, we suggest going to :violet[**{recommended_hotel}**], "
-            f"which is suitable for **{travel_type}** journeys. "
-            f"We all know that **{food_type}** food is very delicious, so we suggest having a meal at :violet[**{recommended_rest}**]. "
-            f"To avoid boredom, what’s your opinion about going for :violet[**{recommended_act}**]? "
-            f"I know you like **{activity_type}**."
-        )
+        
         recommende_speech = (
-            f"Hello! Welcome to Egypt. Firstly, we suggest going to :violet[**{recommended_hotel}**], "
-            f"which is suitable for **{travel_type}** journeys. "
-            f"We all know that **{food_type}** food is very delicious, so we suggest having a meal at :violet[**{recommended_rest}**]. "
-            f"To avoid boredom, what’s your opinion about going for :violet[**{recommended_act}**]? "
-            f"I know you like **{activity_type}**."
+            f"Hello! Welcome to Egypt. Firstly, we suggest going to {recommended_hotel}, "
+            f"which is suitable for {travel_type} journeys. "
+            f"We all know that {food_type} food is very delicious, so we suggest having a meal at {recommended_rest}. "
+            f"To avoid boredom, what’s your opinion about going for {recommended_act}? "
+            f"I know you like {activity_type}."
         )
 
-        # Text-to-Speech using pyttsx3
-        def play_tts_pyttsx3(text):
-            engine = pyttsx3.init()
-            engine.setProperty('rate', 150)
-            audio_data = BytesIO()
-            engine.save_to_file(text, audio_data)
-            engine.runAndWait()
-            audio_data.seek(0)
-            return audio_data
-
-        tts_audio = play_tts_pyttsx3(recommende_speech)
+        # Call the Google Text-to-Speech API
+        tts_audio = play_tts_google(recommende_speech)
         audio_base64 = base64.b64encode(tts_audio.read()).decode()
         audio_url = f"data:audio/mp3;base64,{audio_base64}"
 
-        # Embedded audio player
+        # Embeded Audio Player
         st.markdown(f"""
             <audio controls style="width: 100%; height: 30px; border: none;">
                 <source src="{audio_url}" type="audio/mp3">
