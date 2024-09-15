@@ -1,7 +1,7 @@
 # Used Libraries:
 import pandas as pd
 import streamlit as st
-from gtts import gTTS
+import pyttsx3
 from io import BytesIO
 import base64
 
@@ -92,19 +92,21 @@ with st.expander(":green[Travel Vision Suggestions 🎯]", expanded=True):
             f"I know you like **{activity_type}**."
         )
 
-        # Text-to-Speech
-        def play_tts(text):
-            tts = gTTS(text, lang='en')
+        # Text-to-Speech using pyttsx3
+        def play_tts_pyttsx3(text):
+            engine = pyttsx3.init()
+            engine.setProperty('rate', 150)
             audio_data = BytesIO()
-            tts.write_to_fp(audio_data)
+            engine.save_to_file(text, audio_data)
+            engine.runAndWait()
             audio_data.seek(0)
             return audio_data
 
-        tts_audio = play_tts(recommende_speech)
+        tts_audio = play_tts_pyttsx3(recommende_speech)
         audio_base64 = base64.b64encode(tts_audio.read()).decode()
         audio_url = f"data:audio/mp3;base64,{audio_base64}"
 
-        # Embeded
+        # Embedded audio player
         st.markdown(f"""
             <audio controls style="width: 100%; height: 30px; border: none;">
                 <source src="{audio_url}" type="audio/mp3">
